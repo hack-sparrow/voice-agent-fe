@@ -11,7 +11,7 @@ export interface StartAudioButtonProps extends ComponentProps<'button'> {
    * The size of the button.
    * @defaultValue 'default'
    */
-  size?: 'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   /**
    * The variant of the button.
    * @defaultValue 'default'

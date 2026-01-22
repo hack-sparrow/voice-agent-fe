@@ -17,7 +17,7 @@ export default function ViewController() {
         return TokenSource.sandboxTokenServer(appConfig.sandboxId);
       } else if (appConfig.tokenEndpoint) {
         // Use custom token endpoint if provided
-        return TokenSource.url(appConfig.tokenEndpoint);
+        return TokenSource.endpoint(appConfig.tokenEndpoint);
       } else {
         // Fallback: try to use sandbox with a warning
         console.warn('No token source configured. Please set VITE_SANDBOX_ID or VITE_TOKEN_ENDPOINT in your .env file.');

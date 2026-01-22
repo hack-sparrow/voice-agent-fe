@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRoomContext, RoomAudioRenderer } from '@livekit/components-react';
 import { RoomEvent } from 'livekit-client';
-import ToolVisualizer from './ToolVisualizer';
-import SummaryView from './SummaryView';
+import ToolVisualizer from './custom/ToolVisualizer';
+import SummaryView from './custom/SummaryView';
 import './AgentInterface.css';
 
 // RoomInner was the actual content. We now export it as the default component.

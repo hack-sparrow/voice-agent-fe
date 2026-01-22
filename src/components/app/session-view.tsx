@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { type UseSessionReturn, useRoomContext, useVoiceAssistant, VideoTrack } from '@livekit/components-react';
-import { RoomEvent } from 'livekit-client';
+import { RoomEvent, ParticipantKind } from 'livekit-client';
 import { AgentSessionProvider } from '@/components/agents-ui/agent-session-provider';
 import { AgentControlBar } from '@/components/agents-ui/agent-control-bar';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
@@ -19,14 +19,13 @@ export default function SessionView({ session }: SessionViewProps) {
   const { state, audioTrack, videoTrack, agent } = useVoiceAssistant();
   const [currentTool, setCurrentTool] = useState<any>(null);
   const [summary, setSummary] = useState<any>(null);
-  const [agentJoined, setAgentJoined] = useState(false);
+  const [_agentJoined, setAgentJoined] = useState(false);
 
   // Log agent state changes
   useEffect(() => {
     if (state) {
       console.log('[Agent Status] Agent state changed:', {
         state,
-        canListen: agent?.canListen,
         hasAudioTrack: !!audioTrack,
         hasVideoTrack: !!videoTrack,
       });
@@ -45,7 +44,7 @@ export default function SessionView({ session }: SessionViewProps) {
         identity: participant.identity,
         kind: participant.kind,
         sid: participant.sid,
-        isAgent: participant.kind === 'agent',
+        isAgent: participant.kind === ParticipantKind.AGENT,
         tracks: Array.from(participant.trackPublications.values()).map((t: any) => ({
           sid: t.sid,
           name: t.trackName,
@@ -60,7 +59,7 @@ export default function SessionView({ session }: SessionViewProps) {
     const checkAgentJoined = () => {
       const remoteParticipants = Array.from(room.remoteParticipants.values());
       const agentParticipants = remoteParticipants.filter(
-        (participant) => participant.kind === 'agent'
+        (participant) => participant.kind === ParticipantKind.AGENT
       );
       const hasAgent = agentParticipants.length > 0;
       
@@ -103,7 +102,7 @@ export default function SessionView({ session }: SessionViewProps) {
     // Listen for participant connections
     const handleParticipantConnected = (participant: any) => {
       logParticipantInfo(participant, 'Participant connected');
-      if (participant.kind === 'agent') {
+      if (participant.kind === ParticipantKind.AGENT) {
         console.log(`[Agent Status] ✅ AGENT PARTICIPANT JOINED - Identity: ${participant.identity}, SID: ${participant.sid}`);
       }
       checkAgentJoined();
@@ -111,7 +110,7 @@ export default function SessionView({ session }: SessionViewProps) {
 
     const handleParticipantDisconnected = (participant: any) => {
       logParticipantInfo(participant, 'Participant disconnected');
-      if (participant.kind === 'agent') {
+      if (participant.kind === ParticipantKind.AGENT) {
         console.log(`[Agent Status] ⚠️ AGENT PARTICIPANT DISCONNECTED - Identity: ${participant.identity}`);
       }
       checkAgentJoined();
@@ -125,9 +124,9 @@ export default function SessionView({ session }: SessionViewProps) {
         trackName: publication.trackName,
         trackKind: publication.kind,
         trackSource: publication.source,
-        isAgent: participant.kind === 'agent',
+        isAgent: participant.kind === ParticipantKind.AGENT,
       });
-      if (participant.kind === 'agent') {
+      if (participant.kind === ParticipantKind.AGENT) {
         console.log(`[Agent Status] ✅ Agent published track: ${publication.trackName} (${publication.kind})`);
       }
     };
@@ -138,7 +137,7 @@ export default function SessionView({ session }: SessionViewProps) {
         participantKind: participant.kind,
         trackSid: publication.sid,
         trackName: publication.trackName,
-        isAgent: participant.kind === 'agent',
+        isAgent: participant.kind === ParticipantKind.AGENT,
       });
     };
 
@@ -241,7 +240,7 @@ export default function SessionView({ session }: SessionViewProps) {
                         ? 'bg-green-400'
                         : state === 'idle'
                         ? 'bg-blue-400'
-                        : state === 'error' || state === 'failed'
+                        : state === 'failed'
                         ? 'bg-red-400'
                         : 'bg-yellow-400'
                       : 'bg-yellow-400'
@@ -260,9 +259,7 @@ export default function SessionView({ session }: SessionViewProps) {
                           ? 'Thinking'
                           : state === 'speaking'
                           ? 'Speaking'
-                          : state === 'interrupted'
-                          ? 'Interrupted'
-                          : state === 'error' || state === 'failed'
+                          : state === 'failed'
                           ? 'Error'
                           : state
                           ? state.charAt(0).toUpperCase() + state.slice(1)
@@ -278,7 +275,7 @@ export default function SessionView({ session }: SessionViewProps) {
           {audioTrack && (
             <div className="w-full max-w-2xl mb-8">
               <AgentAudioVisualizerBar
-                trackRef={audioTrack}
+                audioTrack={audioTrack}
                 state={state}
                 barCount={15}
                 className="h-24"

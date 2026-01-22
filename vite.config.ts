@@ -10,4 +10,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    // Allows any public URL (perfect for Railway/dynamic domains)
+    allowedHosts: true,
+    host: true, // Ensure this is also set to expose 0.0.0.0
+  },
+  // If you are running "npm run preview", use this instead:
+  preview: {
+    allowedHosts: true,
+    host: true,
+  },
 })
